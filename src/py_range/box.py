@@ -1,30 +1,38 @@
 class box:
-    def open(self, port:int):
-        """Open a given port"""
+    def open(self, port: int | list[int]):
+        '''Open given port(s)'''
         raise NotImplementedError
 
-    def close(self, port:int):
-        """Close a given port"""
+    def close(self, port: int | list[int]):
+        '''Close given port(s)'''
         raise NotImplementedError
 
-    def put(self, source:str, destination:str):
-        """Load a local file (source) into the box (at destination)"""
+    def ports(self) -> list[int]:
+        '''Return the currently open ports on the box (query Docker live)'''
         raise NotImplementedError
 
-    def dir(self, path:str="/", recurse:bool=False):
-        """List the box's file contents, with root as the default file path, recursively only if specified"""
+    def ps(self):
+        '''Return the processes currently running on the box'''
         raise NotImplementedError
 
-    def run(self, command:str, path:str="/"):
-        """Run a command on the box, from the root path by default"""
+    def put(self, source: str, destination: str):
+        '''Place a local file from source to destination in the box'''
+        raise NotImplementedError
+        
+    def dir(self, path: str = '/', recurse: bool = False) -> list[str]:
+        '''List the contents at path'''
+        raise NotImplementedError
+        
+    def run(self, command: str) -> str:
+        '''Returns the output from running a given command'''
         raise NotImplementedError
 
     @classmethod
-    def docker(cls, image:str):
-        """Create a box from a named docker image"""
+    def docker(cls, image: str):
+        '''Create a box from a named docker image'''
         raise NotImplementedError
 
     @classmethod
-    def dockerfile(cls, filepath:str):
-        """Create a box from a local dockerfile"""
+    def dockerfile(cls, filepath: str):
+        '''Create a box from a local dockerfile'''
         raise NotImplementedError
