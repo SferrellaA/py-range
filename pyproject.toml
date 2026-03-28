@@ -4,4 +4,16 @@ version = "0.1.0"
 description = "pythonically create a test range"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "python-on-whales",
+]
+packages = [{include = "src/py_range", from = "src"}]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
