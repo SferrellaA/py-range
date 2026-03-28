@@ -22,6 +22,14 @@ def local_file(tmp_path):
     return str(p)
 
 
+@pytest.fixture
+def docker_box():
+    '''Fixture for box.docker alpine w/ cleanup.'''
+    b = box.docker('alpine')
+    yield b
+    b.close_box()
+
+
 def test_box_docker():
     '''Test creating box from Docker image.'''
     b = box.docker('alpine')
@@ -30,9 +38,9 @@ def test_box_docker():
     assert len(processes) > 0
 
 
-def test_ports():
+def test_ports(docker_box):
     '''Test ports management.'''
-    b = box()
+    b = docker_box
     b.open(22)
     assert 22 in b.ports()
     b.open(80)
@@ -47,16 +55,16 @@ def test_ports():
     assert set(b.ports()) == {22, 8080}
 
 
-def test_put(local_file):
+def test_put(local_file, docker_box):
     '''Test putting files into box.'''
-    b = box()
+    b = docker_box
     b.put(local_file, '/app.txt')
     assert 'app.txt' in b.dir('/')
 
 
-def test_dir(local_file):
+def test_dir(local_file, docker_box):
     '''Test directory listing.'''
-    b = box()
+    b = docker_box
     files = b.dir('/', recurse=True)
     assert isinstance(files, list)
     b.put(local_file, '/app.txt')
@@ -64,9 +72,9 @@ def test_dir(local_file):
     assert 'app.txt' in files
 
 
-def test_run():
+def test_run(docker_box):
     '''Test running commands.'''
-    b = box()
+    b = docker_box
     output = b.run('ls /', background=False)
     assert isinstance(output, str)
     assert 'bin' in output
@@ -74,9 +82,9 @@ def test_run():
     assert isinstance(pid, (int, str))  # PID/handle
 
 
-def test_ps():
+def test_ps(docker_box):
     '''Test process listing.'''
-    b = box()
+    b = docker_box
     b.run('sleep inf', background=True)
     processes = b.ps()
     assert isinstance(processes, list)

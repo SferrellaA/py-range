@@ -7,8 +7,9 @@
 
 ## Testing Verification
 - ALWAYS check test collection first: `uv run pytest --collect-only` (confirm expected # tests).
-- Run `uv run pytest -v -ra` to verify passes/fails/skips (positive presence, not just no errors).
+- Run `uv run pytest -v -ra` to verify passes/fails/skips (positive presence, not just no errors). **Carefully read the entire output multiple times before claiming "tests pass". NEVER assume based on plan.**
 - Update tests post-impl; aim 80%+ coverage.
+- After non-trivial code changes, ALWAYS run `uv run pytest` and inspect full output (errors, skips, coverage).
 
 - **Python Edits**: Mimic existing style (indent, types, docstrings). Read file first.
 
