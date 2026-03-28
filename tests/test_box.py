@@ -15,12 +15,19 @@ def test_box_class():
     assert hasattr(b, 'ps')
 
 
-@pytest.mark.skip(reason='Requires Docker implementation')
+@pytest.fixture
+def local_file(tmp_path):
+    p = tmp_path / 'local.txt'
+    p.write_text('hello')
+    return str(p)
+
+
 def test_box_docker():
     '''Test creating box from Docker image.'''
     b = box.docker('alpine')
     assert isinstance(b, box)
-    # TODO check that the alpine container b wraps is actually present
+    processes = b.ps()
+    assert len(processes) > 0
 
 
 def test_ports():
@@ -34,36 +41,43 @@ def test_ports():
     b.close(22)
     assert 22 not in b.ports()
     assert 80 in b.ports()
-    # TODO add support for opening and closing more than one port at a time
+    b.close([80])
+    assert 80 not in b.ports()
+    b.open([22, 8080])
+    assert set(b.ports()) == {22, 8080}
 
 
-def test_put():
+def test_put(local_file):
     '''Test putting files into box.'''
     b = box()
-    b.put('local.txt', '/app.txt') # TODO local.txt should be a real file that pytest can actually reach during testing
+    b.put(local_file, '/app.txt')
     assert 'app.txt' in b.dir('/')
 
 
-def test_dir():
+def test_dir(local_file):
     '''Test directory listing.'''
     b = box()
     files = b.dir('/', recurse=True)
     assert isinstance(files, list)
-    # TODO have this call test_put and then check dir again and confirm that the new file is present
+    b.put(local_file, '/app.txt')
+    files = b.dir('/')
+    assert 'app.txt' in files
 
 
 def test_run():
     '''Test running commands.'''
     b = box()
-    output = b.run('ls /')
+    output = b.run('ls /', background=False)
     assert isinstance(output, str)
-    assert 'bin' in output 
-    # TODO checck that run works correctly with background set to both true or false
+    assert 'bin' in output
+    pid = b.run('sleep 10', background=True)
+    assert isinstance(pid, (int, str))  # PID/handle
 
 
 def test_ps():
     '''Test process listing.'''
     b = box()
+    b.run('sleep inf', background=True)
     processes = b.ps()
     assert isinstance(processes, list)
-    # TODO run a command before and check that it is present when ps is called
+    assert any('sleep' in str(p) for p in processes)

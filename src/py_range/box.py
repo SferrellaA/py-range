@@ -23,7 +23,7 @@ class box:
         '''List the contents at path'''
         raise NotImplementedError
         
-    def run(self, command: str) -> str:
+    def run(self, command: str, background: bool = False) -> str:
         '''Returns the output from running a given command'''
         raise NotImplementedError
 
