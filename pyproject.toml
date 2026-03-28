@@ -1,0 +1,7 @@
+[project]
+name = "py-range"
+version = "0.1.0"
+description = "pythonically create a test range"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
