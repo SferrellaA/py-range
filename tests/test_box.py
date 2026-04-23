@@ -27,10 +27,8 @@ def b():
 
 def test_run(b):
     assert "bin" in b.run('ls /')
+    with pytest.raises(TimeoutError):
+        b.run("sleep infinity", timeout=1)
 
 def test_ps(b):
     assert "sleep infinity" in b.ps()
-
-def test_run_timeout(b):
-    with pytest.raises(TimeoutError):
-        b.run("sleep infinity", timeout=1)
