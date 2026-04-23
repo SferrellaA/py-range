@@ -1,15 +1,19 @@
 # AGENTS.md: Persistent notes for opencode agents across sessions/projects
 
-## Tool Usage Notes
-- **String Escaping in XML Tools**: NEVER use \\\" or escaped quotes in `write`/`edit` newString/oldString. Use raw `"""` or `'''` for docstrings/multiline. XML parser handles it; escapes cause syntax errors in code.
-  - Bad: \\\"\\\"\\\"Doc\\\"\\\"\\\"
-  - Good: \"\"\"Doc\"\"\"
+## Project Intent
+
+This repository is a Python library for quickly creating networks of Docker containers used as ranges for hackathons or cybersecurity capability benchmarks.
+
+**Agent Directives:**
+- Produce professional-grade code: full type annotations (mypy strict), tests &gt;80% coverage (pytest), docstrings, no hacks/suppresses.
+- Follow mature Python lib standards: Black/Ruff formatting, semantic versioning, pyproject.toml structure.
+- Designed for reuse: clear API, examples/tests, CLI support.
+- Zero AI slop: human-readable, maintainable, robust.
 
 ## Testing Verification
 - ALWAYS check test collection first: `uv run pytest --collect-only` (confirm expected # tests).
-- Run `uv run pytest -v -ra` to verify passes/fails/skips (positive presence, not just no errors). **Carefully read the entire output multiple times before claiming "tests pass". NEVER assume based on plan.**
+- Run `uv run pytest -v -ra` to verify passes/fails/skips (positive presence, not just no errors).
 - Update tests post-impl; aim 80%+ coverage.
-- After non-trivial code changes, ALWAYS run `uv run pytest` and inspect full output (errors, skips, coverage).
 
 - **Python Edits**: Mimic existing style (indent, types, docstrings). Read file first.
 
@@ -20,4 +24,4 @@
 - Typecheck: uv run mypy .
 - Test: uv run pytest
 
-Last updated: 2026-03-27
+Last updated: Thu Apr 23 2026
