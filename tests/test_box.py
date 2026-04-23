@@ -19,9 +19,18 @@ def test_start_ready():
     assert c.ready() == False
     del(c)
 
-def test_run():
-    '''Test running commands.'''
+@pytest.fixture(scope="session")
+def b():
     b = box(start=True)
-    output = b.run('ls /')
-    print(output)
-    assert 'bin' in output
+    yield b
+    del(b)
+
+def test_run(b):
+    assert "bin" in b.run('ls /')
+
+def test_ps(b):
+    assert "sleep infinity" in b.ps()
+
+def test_run_timeout(b):
+    with pytest.raises(TimeoutError):
+        b.run("sleep infinity", timeout=1)
