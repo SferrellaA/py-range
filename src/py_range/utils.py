@@ -3,7 +3,7 @@ from random import choice
 # words
 prefix = choice([
     'appy', 'old', 'rave', 'keen', 'wise', 'soft', 'rude',
-    'zany', 'mad', 'raw', 'jam', 'gay', 'few', 'vex',
+    'zany', 'mad', 'raw', 'jam', 'happy', 'few', 'vex',
     'blue', 'dry', 'wry', 'icy', 'sun', 'dim',
     'red', 'big', 'wet', 'hot', 'cold', 'warm', 'cool',
     'frosty', 'gentle', 'quick', 'slow', 'brave',

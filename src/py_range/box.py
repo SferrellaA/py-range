@@ -95,13 +95,9 @@ class box:
 
     def dir(self, path: str = "/", recurse: bool = False) -> list[str]:
         """List the contents at path"""
-        if not self.container:
-            raise ValueError("No container; use box.docker()")
-        cmd = "find" if recurse else "ls"
-        cmd_args = [cmd, path]
-        res = docker.container.exec(self.container.name, *cmd_args)
-        return [line.strip() for line in res.stdout.decode().splitlines() if line.strip()]
-
+        results = self.run(f"{'find' if recurse else 'ls'} {path}")
+        return results.split("\n")
+        
     def __del__(self):
         if self.container:
             self.container.remove(force=True)

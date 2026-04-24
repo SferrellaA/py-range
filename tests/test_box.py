@@ -1,5 +1,6 @@
 import pytest
 from py_range import box
+from subprocess import run
 
 def test_start_ready():
     # default
@@ -32,3 +33,20 @@ def test_run(b):
 
 def test_ps(b):
     assert "sleep infinity" in b.ps()
+
+def test_dir(b):
+    assert "bin" in b.dir("/")
+
+def test_put_get(b, tmp_path):
+    test_file = tmp_path / "test.txt"
+    test_file.write_text("test")
+    b.put(str(test_file), "/")
+    assert "test.txt" in b.dir("/")
+    output_file = tmp_path / "test2.txt"
+    b.get("/test.txt", str(output_file))
+    assert output_file.read_text() == "test"
+
+def list_containers() -> str:
+    output = run("docker ps -a", shell=True, capture_output=True)
+    output = str(output.stdout)
+    return output
