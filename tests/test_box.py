@@ -4,7 +4,7 @@ from subprocess import run
 
 def test_start_ready():
     # default
-    a = box()
+    a = box(start=False)
     assert a.ready() == False
     a.start()
     assert a.ready() == True
@@ -22,7 +22,7 @@ def test_start_ready():
 
 @pytest.fixture(scope="session")
 def b():
-    b = box(start=True)
+    b = box()
     yield b
     del(b)
 
@@ -50,3 +50,8 @@ def list_containers() -> str:
     output = run("docker ps -a", shell=True, capture_output=True)
     output = str(output.stdout)
     return output
+
+def test_attach(b):
+    b.run("touch /asdf")
+    a = box.attach(b.name)
+    assert "asdf" in a.run("ls /")

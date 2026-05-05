@@ -13,7 +13,7 @@ class box:
         image: str = "alpine", 
         command: str = "sleep infinity",
         ports: list[int] = [],
-        start: bool = False,
+        start: bool = True,
     ):
         self.image = image
         self.command = command.split()
@@ -23,6 +23,15 @@ class box:
 
         if start:
             self.start()
+
+    @classmethod
+    def attach(cls, name:str):
+        names = [c.name for c in docker.container.list()]
+        if name not in names:
+            raise Exception(f"Could not find container '{name}'")
+        box = cls(name=name, start=False)
+        box.container = docker.container.inspect(name)
+        return box
 
     def start(self):
         # restarts
@@ -101,3 +110,5 @@ class box:
     def __del__(self):
         if self.container:
             self.container.remove(force=True)
+
+    # [name for name in self.container.network_settings.networks][:-1]
