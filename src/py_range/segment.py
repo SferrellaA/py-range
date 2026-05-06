@@ -1,4 +1,5 @@
 from python_on_whales import docker
+
 from .utils import random_name
 from .box import box
 
@@ -9,31 +10,25 @@ class segment:
     ):
         self.name = name if name else random_name()
 
-        if not docker.network.exists(name):
-            self.network = docker.network.create(self.name)
+        if docker.network.exists(self.name):
+            self.network = docker.network.inspect(self.name)
         else:
-            # TODO - this is gross logic
-            self.network = docker.network.inspect(name)
+            self.network = docker.network.create(self.name)            
 
-    @classmethod
-    def attach(cls, name:str):
-        if not docker.network.exists(name):
-            raise Exception(f"Could not find network '{name}'")
-        return cls(name)
-
-    def add(self, box: box):
-        if not box.ready():
-            raise Exception(f"box '{box.name}' is not ready")
-        docker.network.connect(self.network, box.name)
+    def add(self, *box: box):
+        for b in box:
+            if not b.ready():
+                raise Exception(f"box '{b.name}' is not ready")
+            docker.network.connect(self.network, b.name)
 
     def __iadd__(self, box: box):
         self.add(box)
         return self
 
-    def containers(self) -> box:
+    def containers(self) -> list[box]:
         containers = self.network.containers
         names = [containers[c].name for c in containers]
-        boxes = [box.attach(name) for name in names]
+        boxes = [box(name) for name in names]
         return boxes
 
     def __iter__(self):
@@ -57,3 +52,9 @@ class segment:
 
     def __del__(self):
         self.network.remove()
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"Segment('{self.name}')"

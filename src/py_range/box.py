@@ -1,10 +1,8 @@
 import signal
 import sys
-
 from python_on_whales import docker
 
 from .utils import random_name
-
 
 class box:
     def __init__(
@@ -19,40 +17,31 @@ class box:
         self.command = command.split()
         self.name = name if name else random_name()
         self.ports = ports
-        self.container = None
+        if self.name in [c.name for c in docker.container.list()]:
+            self.container = docker.container.inspect(self.name)
+        else:
+            self.container = docker.container.create(
+                self.image,
+                self.command,
+                #detach=True,
+                name=self.name,
+                remove=False,
+            )
 
         if start:
             self.start()
 
-    @classmethod
-    def attach(cls, name:str):
-        names = [c.name for c in docker.container.list()]
-        if name not in names:
-            raise Exception(f"Could not find container '{name}'")
-        box = cls(name=name, start=False)
-        box.container = docker.container.inspect(name)
-        return box
-
     def start(self):
-        # restarts
-        if self.container:
-            self.container.remove(force=True)
-        
-        # start afresh
-        self.container = docker.run(
-            self.image, 
-            self.command, 
-            detach=True, 
-            name=self.name, 
-            remove=False,
-        )
+        self.container.start()
+    
+    def stop(self):
+        self.container.stop()
 
     def ready(self) -> bool:
         """Check if container is running and can accept commands"""
         if not self.container:
             return False
-        info = docker.container.inspect(self.container.name)
-        return info.state.running
+        return self.container.state.running
 
     def run(
         self,
@@ -89,7 +78,6 @@ class box:
             result = docker.execute(self.container, cmd, workdir=path)
         return result
 
-
     def ps(self):
         """Return the processes currently running on the box"""
         return self.run("ps aux")
@@ -110,5 +98,11 @@ class box:
     def __del__(self):
         if self.container:
             self.container.remove(force=True)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"Box('{self.name}')"
 
     # [name for name in self.container.network_settings.networks][:-1]

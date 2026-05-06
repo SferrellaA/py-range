@@ -2,12 +2,14 @@ import pytest
 from py_range import box
 from subprocess import run
 
-def test_start_ready():
+def test_start_stop_ready():
     # default
     a = box(start=False)
     assert a.ready() == False
     a.start()
     assert a.ready() == True
+    a.stop()
+    assert a.ready() == False
     del(a)
 
     # start on creation
@@ -16,7 +18,7 @@ def test_start_ready():
     del(b)
 
     # short command on start
-    c = box(command="ls")
+    c = box(command="ls", start=True)
     assert c.ready() == False
     del(c)
 
@@ -51,7 +53,10 @@ def list_containers() -> str:
     output = str(output.stdout)
     return output
 
-def test_attach(b):
+def test_re_attach(b):
     b.run("touch /asdf")
-    a = box.attach(b.name)
+    a = box(b.name)
     assert "asdf" in a.run("ls /")
+
+def test_str(b):
+    assert str(b) == b.name
